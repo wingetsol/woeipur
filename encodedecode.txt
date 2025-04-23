@@ -11,3 +11,33 @@ Write-Host "ENCODED: " $Encoded
 [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($Encoded)) | Out-File -Encoding "ASCII" c:\setup\YourFileDecoded.txt
 $Content2 = get-content c:\setup\YourFileDecoded.txt
 Write-Host "DECODED: " $Content2
+
+
+
+EXE***********************
+# Encode
+$FilePath = "c:\setup\foo.exe"
+$File = [System.IO.File]::ReadAllBytes($FilePath);
+# returns the base64 string
+$Base64String = [System.Convert]::ToBase64String($File);
+ 
+# Decode
+function Convert-StringToBinary {
+[CmdletBinding()]
+param (
+[string] $EncodedString
+, [string] $FilePath = (‘{0}\{1}’ -f $env:TEMP, [System.Guid]::NewGuid().ToString())
+)
+try {
+if ($EncodedString.Length -ge 1) {
+ 
+# decodes the base64 string
+$ByteArray = [System.Convert]::FromBase64String($EncodedString);
+[System.IO.File]::WriteAllBytes($FilePath, $ByteArray);
+}
+}
+catch {
+}
+Write-Output -InputObject (Get-Item -Path $FilePath);
+}
+$DecodedFile = Convert-StringToBinary -EncodedString $Base64String -FilePath C:\setup\foo.exe
